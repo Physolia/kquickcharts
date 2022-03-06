@@ -9,6 +9,7 @@
 #define DATASOURCE_H
 
 #include <QObject>
+#include <QVariant>
 
 /**
  * Abstract base class for data sources.
@@ -29,6 +30,31 @@ public:
     virtual QVariant first() const;
 
     Q_SIGNAL void dataChanged();
+
+protected:
+    template <typename Iterator>
+    QVariant minimumVariant(Iterator begin, Iterator end) const
+    {
+        auto itr = std::min_element(begin, end, [](const QVariant &first, const QVariant &second) {
+            return QVariant::compare(first, second) == QPartialOrdering::Less;
+        });
+        if (itr != end) {
+            return *itr;
+        }
+        return QVariant{};
+    }
+
+    template <typename Iterator>
+    QVariant maximumVariant(Iterator begin, Iterator end) const
+    {
+        auto itr = std::max_element(begin, end, [](const QVariant &first, const QVariant &second) {
+            return QVariant::compare(first, second) == QPartialOrdering::Less;
+        });
+        if (itr != end) {
+            return *itr;
+        }
+        return QVariant{};
+    }
 };
 
 #endif // DATASOURCE_H

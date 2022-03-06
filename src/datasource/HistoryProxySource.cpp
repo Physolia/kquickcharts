@@ -34,13 +34,13 @@ QVariant HistoryProxySource::item(int index) const
     }
 
     if (m_fillMode == FillFromStart && index >= m_history.count()) {
-        return QVariant{m_dataSource->item(0).type()};
+        return QVariant{m_dataSource->item(0).metaType()};
     }
 
     if (m_fillMode == FillFromEnd && m_history.count() != m_maximumHistory) {
         auto actualIndex = index - (m_maximumHistory - m_history.count());
         if (actualIndex < 0 || actualIndex >= m_history.size()) {
-            return QVariant{m_dataSource->item(0).type()};
+            return QVariant{m_dataSource->item(0).metaType()};
         } else {
             return m_history.at(actualIndex);
         }
@@ -70,7 +70,7 @@ QVariant HistoryProxySource::minimum() const
         }
     }
 
-    return *std::min_element(m_history.begin(), m_history.end());
+    return minimumVariant(m_history.cbegin(), m_history.cend());
 }
 
 QVariant HistoryProxySource::maximum() const
@@ -88,7 +88,7 @@ QVariant HistoryProxySource::maximum() const
         }
     }
 
-    return *std::max_element(m_history.begin(), m_history.end());
+    return maximumVariant(m_history.cbegin(), m_history.cend());
 }
 
 QVariant HistoryProxySource::first() const

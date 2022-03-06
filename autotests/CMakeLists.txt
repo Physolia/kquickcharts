@@ -1,5 +1,5 @@
 
-find_package(Qt${QT_MAJOR_VERSION} COMPONENTS QuickTest)
+find_package(Qt6 COMPONENTS QuickTest)
 
 include(ECMAddTests)
 
@@ -10,11 +10,11 @@ ecm_add_tests(
     MapProxySourceTest.cpp
     HistoryProxySourceTest.cpp
     ItemBuilderTest.cpp
-    LINK_LIBRARIES QuickChartsStatic Qt${QT_MAJOR_VERSION}::Test
+    LINK_LIBRARIES QuickChartsStatic Qt6::Test
 )
 
 add_executable(qmltest qmltest.cpp)
-target_link_libraries(qmltest Qt${QT_MAJOR_VERSION}::QuickTest)
+target_link_libraries(qmltest Qt6::QuickTest)
 
 macro(add_qml_tests)
     if (WIN32)

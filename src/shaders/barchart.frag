@@ -6,34 +6,37 @@
 
 // This requires "sdf.frag" which is included through SDFShader.
 
-uniform lowp vec2 aspect;
-uniform lowp float opacity;
-uniform lowp float radius;
-uniform lowp vec4 backgroundColor;
+layout (binding = 0) uniform UniformBuffer
+{
+    highp mat4 matrix;
+    mediump vec2 aspect;
+    mediump float opacity;
+    highp float radius;
+    lowp vec4 backgroundColor;
+} uniforms;
 
-#ifdef LEGACY_STAGE_INOUT
-varying lowp vec2 uv;
-varying mediump vec4 foregroundColor;
-varying mediump float value;
-#define out_color gl_FragColor
-#else
-in lowp vec2 uv;
-in mediump vec4 foregroundColor;
-in mediump float value;
-out lowp vec4 out_color;
-#endif
+layout (location = 0) in PerVertex
+{
+    highp vec2 uv;
+    lowp vec4 foregroundColor;
+    highp float value;
+} inputs;
+
+layout (location = 0) out mediump vec4 out_color;
 
 void main()
 {
-    lowp vec4 color = vec4(0.0);
+    mediump vec4 color = vec4(0.0);
 
-    lowp float background = sdf_round(sdf_rectangle(uv, vec2(1.0, aspect.y) - radius), radius);
+    highp float background = sdf_round(sdf_rectangle(inputs.uv, vec2(1.0, uniforms.aspect.y) - uniforms.radius), uniforms.radius);
 
-    color = sdf_render(background, color, backgroundColor);
+    color = sdf_render(background, color, uniforms.backgroundColor);
 
-    lowp float foreground = sdf_round(sdf_rectangle(vec2(uv.x, -aspect.y + uv.y + value), vec2(1.0, value) - radius), radius);
+    highp float y = -uniforms.aspect.y + inputs.uv.y + inputs.value;
+    highp float foreground = sdf_rectangle(vec2(inputs.uv.x, y), vec2(1.0, inputs.value) - uniforms.radius);
+    foreground = sdf_round(foreground, uniforms.radius);
 
-    color = sdf_render(foreground, color, foregroundColor);
+    color = sdf_render(foreground, color, inputs.foregroundColor);
 
-    out_color = color * opacity;
+    out_color = color * uniforms.opacity;
 }

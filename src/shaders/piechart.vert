@@ -5,21 +5,43 @@
  * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
  */
 
-uniform highp mat4 matrix;
-uniform lowp vec2 aspect;
+#version 450
 
-#ifdef LEGACY_STAGE_INOUT
-attribute highp vec4 in_vertex;
-attribute mediump vec2 in_uv;
-varying mediump vec2 uv;
-#else
-in highp vec4 in_vertex;
-in mediump vec2 in_uv;
-out mediump vec2 uv;
-#endif
+layout (constant_id = 0) const int MaxSegments = 100;
+
+layout (std140, binding = 0) uniform UniformBuffer
+{
+    highp mat4 matrix;
+    mediump vec2 aspect;
+
+    mediump float opacity;
+    highp float innerRadius;
+    highp float outerRadius;
+
+    mediump float fromAngle;
+    mediump float toAngle;
+
+    int smoothEnds;
+
+    lowp vec4 backgroundColor;
+
+    int segmentCount;
+    highp vec2 segments[MaxSegments];
+    lowp vec4 colors[MaxSegments];
+} uniforms;
+
+layout (location = 0) in highp vec4 in_vertex;
+layout (location = 1) in mediump vec2 in_uv;
+
+layout (location = 0) out mediump vec2 uv;
+
+out gl_PerVertex
+{
+    highp vec4 gl_Position;
+};
 
 void main() {
-    uv = (-1.0 + 2.0 * in_uv) * aspect;
+    uv = (-1.0 + 2.0 * in_uv) * uniforms.aspect;
     uv.y *= -1.0;
-    gl_Position = matrix * in_vertex;
+    gl_Position = uniforms.matrix * in_vertex;
 }

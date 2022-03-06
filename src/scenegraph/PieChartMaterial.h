@@ -12,7 +12,7 @@
 #include <QSGMaterial>
 #include <QSGMaterialShader>
 
-#include "SDFShader.h"
+#include "ShaderDataWriter.h"
 
 class PieChartMaterial : public QSGMaterial
 {
@@ -21,67 +21,56 @@ public:
     ~PieChartMaterial();
 
     QSGMaterialType *type() const override;
-    QSGMaterialShader *createShader() const override;
+    QSGMaterialShader *createShader(QSGRendererInterface::RenderMode) const override;
 
-    QVector2D aspectRatio() const;
-    float innerRadius() const;
-    float outerRadius() const;
-    QColor backgroundColor() const;
-    bool smoothEnds() const;
-    float fromAngle() const;
-    float toAngle() const;
+    QVector2D aspect;
+    float innerRadius = 0.0f;
+    float outerRadius = 0.0f;
+    QColor backgroundColor;
+    bool smoothEnds = false;
+    float fromAngle = 0.0;
+    float toAngle = 6.28318; // 2 * pi
 
-    QVector<QVector2D> segments() const;
-    QVector<QVector4D> colors() const;
+    QVector<QVector2D> segments;
+    QVector<QVector4D> colors;
 
-    void setAspectRatio(const QVector2D &aspect);
-    void setInnerRadius(float radius);
-    void setOuterRadius(float radius);
-    void setBackgroundColor(const QColor &color);
-    void setSmoothEnds(bool smooth);
-    void setFromAngle(float angle);
-    void setToAngle(float angle);
-
-    void setSegments(const QVector<QVector2D> &triangles);
-    void setColors(const QVector<QVector4D> &colors);
-
-private:
-    QVector2D m_aspectRatio;
-    float m_innerRadius = 0.0f;
-    float m_outerRadius = 0.0f;
-    QColor m_backgroundColor;
-    bool m_smoothEnds = false;
-    float m_fromAngle = 0.0;
-    float m_toAngle = 6.28318; // 2 * pi
-
-    QVector<QVector2D> m_segments;
-    QVector<QVector4D> m_colors;
+    bool dirty = false;
 };
 
-class PieChartShader : public SDFShader
+class PieChartWriter : public ShaderDataWriter
+{
+public:
+    PieChartWriter();
+
+    std::size_t Matrix;
+    std::size_t Aspect;
+
+    std::size_t Opacity;
+    std::size_t InnerRadius;
+    std::size_t OuterRadius;
+
+    std::size_t FromAngle;
+    std::size_t ToAngle;
+
+    std::size_t SmoothEnds;
+
+    std::size_t BackgroundColor;
+
+    std::size_t Segments;
+    std::size_t Colors;
+    std::size_t SegmentCount;
+};
+
+class PieChartShader : public QSGMaterialShader
 {
 public:
     PieChartShader();
     ~PieChartShader();
 
-    char const *const *attributeNames() const override;
-
-    void initialize() override;
-    void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override;
+    bool updateUniformData(QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override;
 
 private:
-    int m_matrixLocation = 0;
-    int m_opacityLocation = 0;
-    int m_innerRadiusLocation = 0;
-    int m_outerRadiusLocation = 0;
-    int m_aspectLocation = 0;
-    int m_backgroundColorLocation = 0;
-    int m_colorsLocation = 0;
-    int m_segmentsLocation = 0;
-    int m_segmentCountLocation = 0;
-    int m_smoothEndsLocation = 0;
-    int m_fromAngleLocation = 0;
-    int m_toAngleLocation = 0;
+    static PieChartWriter *s_writer;
 };
 
 #endif // PIECHARTMATERIAL_H

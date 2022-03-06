@@ -28,20 +28,12 @@ QVariant ArraySource::item(int index) const
 
 QVariant ArraySource::minimum() const
 {
-    auto itr = std::min_element(m_array.cbegin(), m_array.cend());
-    if (itr != m_array.cend()) {
-        return *itr;
-    }
-    return QVariant{};
+    return minimumVariant(m_array.cbegin(), m_array.cend());
 }
 
 QVariant ArraySource::maximum() const
 {
-    auto itr = std::max_element(m_array.cbegin(), m_array.cend());
-    if (itr != m_array.cend()) {
-        return *itr;
-    }
-    return QVariant{};
+    return maximumVariant(m_array.cbegin(), m_array.cend());
 }
 
 QVariantList ArraySource::array() const

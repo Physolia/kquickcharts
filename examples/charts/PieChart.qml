@@ -5,16 +5,16 @@
  * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
  */
 
-import QtQuick 2.9
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.2
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import org.kde.kirigami 2.4 as Kirigami
-import org.kde.kquickcontrols 2.0
+//import org.kde.kirigami 2.4 as Kirigami
+//import org.kde.kquickcontrols 2.0
 
 import org.kde.quickcharts 1.0 as Charts
 
-Kirigami.Page {
+Page {
     title: "Pie Chart"
 
     ListModel {
@@ -30,10 +30,13 @@ Kirigami.Page {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.largeSpacing
-        spacing: Kirigami.Units.largeSpacing
+//         anchors.margins: Kirigami.Units.largeSpacing
+        //spacing: Kirigami.Units.largeSpacing
+        anchors.margins: 8
+        spacing: 8
 
-        Kirigami.AbstractCard {
+//         Kirigami.AbstractCard {
+        Rectangle {
             Layout.fillWidth: false
             Layout.fillHeight: false
             Layout.preferredWidth: 600
@@ -43,7 +46,7 @@ Kirigami.Page {
             Charts.PieChart {
                 id: chart
                 anchors.fill: parent
-                anchors.margins: Kirigami.Units.smallSpacing;
+                anchors.margins: 4 //Kirigami.Units.smallSpacing;
 
                 range.to: 150
 
@@ -82,9 +85,10 @@ Kirigami.Page {
                 anchors.fill: parent
                 ListView {
                     model: pieModel;
-                    delegate: Kirigami.BasicListItem {
+                    delegate: ItemDelegate {
                         width: ListView.view.width
-                        height: Kirigami.Units.gridUnit * 2 + Kirigami.Units.smallSpacing
+//                         height: Kirigami.Units.gridUnit * 2 + Kirigami.Units.smallSpacing
+                        height: 40
                         contentItem: RowLayout {
                             Label { text: "Value" }
                             SpinBox {
@@ -95,11 +99,11 @@ Kirigami.Page {
                                 onValueModified: pieModel.setProperty(index, "data", value)
                             }
                             Label { text: "Color" }
-                            ColorButton {
-                                color: model.color;
-                                showAlphaChannel: true;
-                                onColorChanged: pieModel.setProperty(index, "color", color)
-                            }
+                            //ColorButton {
+                                //color: model.color;
+                                //showAlphaChannel: true;
+                                //onColorChanged: pieModel.setProperty(index, "color", color)
+                            //}
                         }
                     }
                 }

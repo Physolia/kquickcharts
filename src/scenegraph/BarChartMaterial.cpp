@@ -21,9 +21,9 @@ QSGMaterialType *BarChartMaterial::type() const
     return &type;
 }
 
-QSGMaterialShader *BarChartMaterial::createShader() const
+QSGMaterialShader *BarChartMaterial::createShader(QSGRendererInterface::RenderMode) const
 {
-    return new BarChartShader();
+    return new BarChartShader{};
 }
 
 int BarChartMaterial::compare(const QSGMaterial *other) const
@@ -40,44 +40,52 @@ int BarChartMaterial::compare(const QSGMaterial *other) const
     return QSGMaterial::compare(other);
 }
 
+BarChartWriter::BarChartWriter()
+{
+    Matrix = appendField(sizeof(float) * 16);
+    Aspect = appendField(sizeof(float) * 2);
+    Opacity = appendField(sizeof(float));
+    Radius = appendField(sizeof(float));
+    BackgroundColor = appendField(sizeof(float) * 4);
+}
+
+BarChartWriter *BarChartShader::s_writer = nullptr;
+
 BarChartShader::BarChartShader()
 {
-    setShaders(QStringLiteral("barchart.vert"), QStringLiteral("barchart.frag"));
+    setShaderFileName(QSGMaterialShader::VertexStage, QStringLiteral(":/org.kde.quickcharts/barchart.vert.qsb"));
+    setShaderFileName(QSGMaterialShader::FragmentStage, QStringLiteral(":/org.kde.quickcharts/barchart.frag.qsb"));
+
+    if (!s_writer) {
+        s_writer = new BarChartWriter{};
+    }
 }
 
-BarChartShader::~BarChartShader()
+bool BarChartShader::updateUniformData(QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
 {
-}
+    auto changed = false;
 
-const char *const *BarChartShader::attributeNames() const
-{
-    static const char *const names[] = {"in_vertex", "in_uv", "in_color", "in_value", nullptr};
-    return names;
-}
+    auto data = state.uniformData();
 
-void BarChartShader::initialize()
-{
-    QSGMaterialShader::initialize();
-    m_matrixLocation = program()->uniformLocation("matrix");
-    m_opacityLocation = program()->uniformLocation("opacity");
-    m_aspectLocation = program()->uniformLocation("aspect");
-    m_backgroundColorLocation = program()->uniformLocation("backgroundColor");
-    m_radiusLocation = program()->uniformLocation("radius");
-}
-
-void BarChartShader::updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial)
-{
     if (state.isMatrixDirty()) {
-        program()->setUniformValue(m_matrixLocation, state.combinedMatrix());
-    }
-    if (state.isOpacityDirty()) {
-        program()->setUniformValue(m_opacityLocation, state.opacity());
+        s_writer->write(data, s_writer->Matrix, state.combinedMatrix());
+        changed = true;
     }
 
-    if (!oldMaterial || newMaterial->compare(oldMaterial) != 0) {
-        BarChartMaterial *material = static_cast<BarChartMaterial *>(newMaterial);
-        program()->setUniformValue(m_aspectLocation, material->aspect);
-        program()->setUniformValue(m_backgroundColorLocation, material->backgroundColor);
-        program()->setUniformValue(m_radiusLocation, material->radius);
+    if (state.isOpacityDirty()) {
+        s_writer->write(data, s_writer->Opacity, state.opacity());
+        changed = true;
     }
+
+    auto material = static_cast<BarChartMaterial*>(newMaterial);
+    if (oldMaterial != newMaterial || material->dirty) {
+        s_writer->write(data, s_writer->Aspect, material->aspect);
+        s_writer->write(data, s_writer->Radius, material->radius);
+        s_writer->write(data, s_writer->BackgroundColor, material->backgroundColor);
+
+        material->dirty = false;
+        changed = true;
+    }
+
+    return changed;
 }

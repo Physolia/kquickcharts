@@ -18,3 +18,25 @@ QVariant ChartDataSource::first() const
 {
     return item(0);
 }
+
+// QVariant ChartDataSource::minimumVariant(const QVariantList &input) const
+// {
+//     auto itr = std::min_element(input.cbegin(), input.cend(), [](const QVariant &first, const QVariant &second) {
+//         return QVariant::compare(first, second) == QPartialOrdering::Less;
+//     });
+//     if (itr != input.cend()) {
+//         return *itr;
+//     }
+//     return QVariant{};
+// }
+//
+// QVariant ChartDataSource::maximumVariant(const QVariantList &input) const
+// {
+//     auto itr = std::max_element(input.cbegin(), input.cend(), [](const QVariant &first, const QVariant &second) {
+//         return QVariant::compare(first, second) == QPartialOrdering::Less;
+//     });
+//     if (itr != input.cend()) {
+//         return *itr;
+//     }
+//     return QVariant{};
+// }

@@ -112,11 +112,12 @@ QVariant ModelSource::minimum() const
         return minProperty;
     }
 
-    QVariant result = std::numeric_limits<float>::max();
+    QVariantList values;
+    values.reserve(itemCount());
     for (int i = 0; i < itemCount(); ++i) {
-        result = qMin(result, item(i));
+        values << item(i);
     }
-    return result;
+    return minimumVariant(values.cbegin(), values.cend());
 }
 
 QVariant ModelSource::maximum() const
@@ -135,11 +136,12 @@ QVariant ModelSource::maximum() const
         return maxProperty;
     }
 
-    QVariant result = std::numeric_limits<float>::min();
+    QVariantList values;
+    values.reserve(itemCount());
     for (int i = 0; i < itemCount(); ++i) {
-        result = qMax(result, item(i));
+        values << item(i);
     }
-    return result;
+    return maximumVariant(values.cbegin(), values.cend());
 }
 
 void ModelSource::setRole(int role)

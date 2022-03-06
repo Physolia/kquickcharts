@@ -71,11 +71,12 @@ void PieChartNode::setRect(const QRectF &rect)
     QVector2D aspect{1.0, 1.0};
     aspect.setX(rect.width() / minDimension);
     aspect.setY(rect.height() / minDimension);
-    m_material->setAspectRatio(aspect);
+    m_material->aspect = aspect;
 
-    m_material->setInnerRadius(m_innerRadius / minDimension);
-    m_material->setOuterRadius(m_outerRadius / minDimension);
+    m_material->innerRadius = m_innerRadius / minDimension;
+    m_material->outerRadius = m_outerRadius / minDimension;
 
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }
 
@@ -88,8 +89,9 @@ void PieChartNode::setInnerRadius(qreal radius)
     m_innerRadius = radius;
 
     auto minDimension = qMin(m_rect.width(), m_rect.height());
-    m_material->setInnerRadius(m_innerRadius / minDimension);
+    m_material->innerRadius = m_innerRadius / minDimension;
 
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }
 
@@ -102,8 +104,9 @@ void PieChartNode::setOuterRadius(qreal radius)
     m_outerRadius = radius;
 
     auto minDimension = qMin(m_rect.width(), m_rect.height());
-    m_material->setOuterRadius(m_outerRadius / minDimension);
+    m_material->outerRadius = m_outerRadius / minDimension;
 
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }
 
@@ -126,7 +129,8 @@ void PieChartNode::setBackgroundColor(const QColor &color)
     }
 
     m_backgroundColor = color;
-    m_material->setBackgroundColor(color);
+    m_material->backgroundColor = color;
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }
 
@@ -137,7 +141,8 @@ void PieChartNode::setFromAngle(qreal angle)
     }
 
     m_fromAngle = angle;
-    m_material->setFromAngle(degToRad(angle));
+    m_material->fromAngle = degToRad(angle);
+    m_material->dirty = true;
     updateTriangles();
 }
 
@@ -148,7 +153,8 @@ void PieChartNode::setToAngle(qreal angle)
     }
 
     m_toAngle = angle;
-    m_material->setToAngle(degToRad(angle));
+    m_material->toAngle = degToRad(angle);
+    m_material->dirty = true;
     updateTriangles();
 }
 
@@ -159,7 +165,8 @@ void PieChartNode::setSmoothEnds(bool smooth)
     }
 
     m_smoothEnds = smooth;
-    m_material->setSmoothEnds(smooth);
+    m_material->smoothEnds = smooth;
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }
 
@@ -186,8 +193,9 @@ void PieChartNode::updateTriangles()
         segments.clear();
     }
 
-    m_material->setSegments(segments);
-    m_material->setColors(colors);
+    m_material->segments = segments;
+    m_material->colors = colors;
 
+    m_material->dirty = true;
     markDirty(QSGNode::DirtyMaterial);
 }

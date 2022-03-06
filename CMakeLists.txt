@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(KF_VERSION "5.92.0") # handled by release scripts
+set(KF_VERSION "5.99.99") # handled by release scripts
 set(KF_DEP_VERSION "5.91.0") # handled by release scripts
+set(QT_MAJOR_VERSION 6)
 
 project(KQuickCharts VERSION ${KF_VERSION})
 
 include(FeatureSummary)
-find_package(ECM 5.91.0 NO_MODULE)
+find_package(ECM ${KF_DEP_VERSION} NO_MODULE)
 set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://commits.kde.org/extra-cmake-modules")
 feature_summary(WHAT REQUIRED_PACKAGES_NOT_FOUND FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
@@ -26,8 +27,8 @@ include(ECMQmlModule)
 
 option(BUILD_EXAMPLES "Build example applications" OFF)
 
-set(REQUIRED_QT_VERSION 5.15.2)
-find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} CONFIG REQUIRED Qml Quick QuickControls2)
+set(REQUIRED_QT_VERSION 6.2.0)
+find_package(Qt6 ${REQUIRED_QT_VERSION} CONFIG REQUIRED Qml Quick QuickControls2 ShaderTools)
 
 set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprecated API excluded from the build [default=0].")
 
@@ -44,29 +45,29 @@ endif()
 
 ecm_setup_version(
     PROJECT
-    VARIABLE_PREFIX KF5QuickCharts
+    VARIABLE_PREFIX KQuickCharts
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/quickcharts_version.h"
-    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5QuickChartsConfigVersion.cmake"
+    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KQuickChartsConfigVersion.cmake"
     SOVERSION 1
 )
 
 configure_package_config_file(
-    "KF5QuickChartsConfig.cmake.in"
-    "KF5QuickChartsConfig.cmake"
-    INSTALL_DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5QuickCharts
+    "KQuickChartsConfig.cmake.in"
+    "KQuickChartsConfig.cmake"
+    INSTALL_DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KQuickCharts
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/KF5QuickChartsConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/KF5QuickChartsConfigVersion.cmake"
-    DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5QuickCharts
+    "${CMAKE_CURRENT_BINARY_DIR}/KQuickChartsConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/KQuickChartsConfigVersion.cmake"
+    DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KQuickCharts
     COMPONENT Devel
 )
 
-install(EXPORT KF5QuickChartsTargets
-    DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5QuickCharts
-    FILE KF5QuickChartsTargets.cmake
-    NAMESPACE KF5::
+install(EXPORT KQuickChartsTargets
+    DESTINATION ${KDE_INSTALL_CMAKEPACKAGEDIR}/KQuickCharts
+    FILE KQuickChartsTargets.cmake
+    NAMESPACE KF6::
 )
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

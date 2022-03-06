@@ -4,26 +4,37 @@
  * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
  */
 
-uniform highp mat4 matrix;
-uniform lowp vec2 aspect;
+#version 450
 
-#ifdef LEGACY_STAGE_INOUT
-#define in attribute
-#define out varying
-#endif
+layout (binding = 0) uniform UniformBuffer
+{
+    highp mat4 matrix;
+    mediump vec2 aspect;
+    mediump float opacity;
+    highp float radius;
+    lowp vec4 backgroundColor;
+} uniforms;
 
-in highp vec4 in_vertex;
-in mediump vec2 in_uv;
-in mediump vec4 in_color;
-in mediump float in_value;
+layout (location = 0) in highp vec4 in_vertex;
+layout (location = 1) in highp vec2 in_uv;
+layout (location = 2) in mediump vec4 in_color;
+layout (location = 3) in highp float in_value;
 
-out mediump vec2 uv;
-out mediump vec4 foregroundColor;
-out mediump float value;
+layout (location = 0) out PerVertex
+{
+    highp vec2 uv;
+    lowp vec4 foregroundColor;
+    highp float value;
+} outputs;
+
+out gl_PerVertex
+{
+    highp vec4 gl_Position;
+};
 
 void main() {
-    uv = (-1.0 + 2.0 * in_uv) * aspect;
-    value = in_value;
-    foregroundColor = in_color;
-    gl_Position = matrix * in_vertex;
+    outputs.uv = (-1.0 + 2.0 * in_uv) * uniforms.aspect;
+    outputs.value = in_value;
+    outputs.foregroundColor = in_color;
+    gl_Position = uniforms.matrix * in_vertex;
 }
